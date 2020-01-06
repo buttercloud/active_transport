@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_transport (0.1.9)
+    active_transport (0.1.0)
       http (~> 4.2.0)
 
 GEM
