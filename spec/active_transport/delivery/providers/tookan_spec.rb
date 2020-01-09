@@ -62,7 +62,7 @@ RSpec.describe ActiveTransport::Delivery::TookanProvider do
       end
 
       describe "#get_cost" do
-        it "should call the appropriate API endpoint for getting the cost of an order" do
+        it "should raise an unsupported method exception" do
           address = ActiveTransport::Delivery::Address.new(latitude: "12", longitude: "13")
 
           expect { @tookan.get_cost(address) }.to raise_exception(ActiveTransport::Delivery::TookanProvider::UnsupportedOperation)
@@ -76,6 +76,53 @@ RSpec.describe ActiveTransport::Delivery::TookanProvider do
           expect(HTTP).to receive(:post).with(URI.parse(@tookan.test_url + "get_job_details").to_s, json: data)
 
           @tookan.track_order(order_ids)
+        end
+      end
+
+      describe "#create_driver" do
+        it "should call the appropriate API endpoint for creating a driver account" do
+          data = {hello: "world", api_key: api_key}
+          expect(HTTP).to receive(:post).with(URI.parse(@tookan.test_url + "add_agent").to_s, json: data)
+
+          @tookan.create_driver(data)
+        end
+      end
+
+      describe "#delete_driver_account" do
+        it "should call the appropriate API endpoint for deleting a driver account" do
+          driver_id = 1
+          data = {fleet_id: driver_id, api_key: api_key}
+          expect(HTTP).to receive(:post).with(URI.parse(@tookan.test_url + "delete_fleet_account").to_s, json: data)
+
+          @tookan.delete_driver_account(driver_id)
+        end
+      end
+
+      describe "#get_driver_location" do
+        it "should call the appropriate API endpoint for getting a driver location" do
+          driver_id = 1
+          data = {fleet_id: driver_id, api_key: api_key}
+          expect(HTTP).to receive(:post).with(URI.parse(@tookan.test_url + "get_fleet_location").to_s, json: data)
+
+          @tookan.get_driver_location(driver_id)
+        end
+      end
+
+      describe "#get_teams" do
+        it "should call the appropriate API endpoint for getting teams" do
+          data = {api_key: api_key}
+          expect(HTTP).to receive(:post).with(URI.parse(@tookan.test_url + "view_all_team_only").to_s, json: data)
+
+          @tookan.get_teams
+        end
+      end
+
+      describe "#update_order" do
+        it "should call the appropriate API endpoint for updating an order" do
+          data = {hello: "world", api_key: api_key}
+          expect(HTTP).to receive(:post).with(URI.parse(@tookan.test_url + "edit_task").to_s, json: data)
+
+          @tookan.update_order(data)
         end
       end
 

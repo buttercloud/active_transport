@@ -85,6 +85,12 @@ RSpec.describe ActiveTransport::Delivery::GogoProvider do
         end
       end
 
+      describe "#update_order" do
+        it "should raise an unsupported method exception" do
+          expect { @gogo.update_order({}) }.to raise_exception(ActiveTransport::Delivery::GogoProvider::UnsupportedOperation)
+        end
+      end
+
       describe "#create_order" do
         it "should call the appropriate API endpoint for creating an order" do
           data = {hello: "world"}

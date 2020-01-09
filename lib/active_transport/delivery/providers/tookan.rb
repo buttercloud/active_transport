@@ -22,6 +22,26 @@ module ActiveTransport
         connect("create_multiple_tasks", :post, data)
       end
 
+      def update_order(data)
+        connect("edit_task", :post, data)
+      end
+
+      def get_teams
+        connect("view_all_team_only", :post, {})
+      end
+
+      def create_driver(data)
+        connect("add_agent", :post, data)
+      end
+
+      def get_driver_location(driver_id)
+        connect("get_fleet_location", :post, {fleet_id: driver_id})
+      end
+
+      def delete_driver_account(driver_id)
+        connect("delete_fleet_account", :post, {fleet_id: driver_id})
+      end
+
       def track_order(order_ids=[])
         connect("get_job_details", :post, {job_ids: order_ids, include_task_history: 0})
       end

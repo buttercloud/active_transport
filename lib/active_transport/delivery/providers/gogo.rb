@@ -3,6 +3,8 @@ require 'http'
 module ActiveTransport
   module Delivery
     class GogoProvider < Provider
+      class UnsupportedOperation < StandardError; end
+
       attr_reader :api_key, :test, :test_url, :live_url
 
       def test?
@@ -18,6 +20,26 @@ module ActiveTransport
 
       def create_order(data)
         connect("orders", :post, data)
+      end
+
+      def update_order(data)
+        raise UnsupportedOperation.new("Operation not supported on Gogo Delivery")
+      end
+
+      def get_teams
+        raise UnsupportedOperation.new("Operation not supported on Gogo Delivery")
+      end
+
+      def get_driver_location(driver_id)
+        raise UnsupportedOperation.new("Operation not supported on Gogo Delivery")
+      end
+
+      def delete_driver_account(driver_id)
+        raise UnsupportedOperation.new("Operation not supported on Gogo Delivery")
+      end
+
+      def create_driver(data)
+        raise UnsupportedOperation.new("Operation not supported on Gogo Delivery")
       end
 
       def track_order(order_id)
