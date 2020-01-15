@@ -76,7 +76,7 @@ module ActiveTransport
 
           return Response.new(body["status"] == 200, body, {test: test?})
         rescue StandardError, HTTP::Error => e
-          return Response.new(false, e.message, {test: test?})
+          return Response.new(false, {error: e.message}, {test: test?})
         end
       end
     end
