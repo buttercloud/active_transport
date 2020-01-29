@@ -43,6 +43,36 @@ RSpec.describe ActiveTransport::Delivery::GogoProvider do
         allow(@http_client).to receive(:get).and_return(http_resp)
       end
 
+      describe "#list_pickup_addresses" do
+        it "should call the appropriate API endpoint for listing pickup addresses" do
+          expect(HTTP).to receive(:headers).with(authorization: api_key)
+          expect(@http_client).to receive(:get).with(URI.parse(@gogo.test_url + "pickups/list").to_s, params: {})
+
+          @gogo.list_pickup_addresses
+        end
+      end
+
+      describe "#create_pickup_address" do
+        it "should call the appropriate API endpoint for creating a pickup address" do
+          data = {hello: "world"}
+          expect(HTTP).to receive(:headers).with(authorization: api_key)
+          expect(@http_client).to receive(:post).with(URI.parse(@gogo.test_url + "pickups/add").to_s, form: data)
+
+          @gogo.create_pickup_address(data)
+        end
+      end
+
+      describe "#delete_pickup_address" do
+        it "should call the appropriate API endpoint for deleting a pickup address" do
+          address_id = 3
+          data = {address_id: address_id}
+          expect(HTTP).to receive(:headers).with(authorization: api_key)
+          expect(@http_client).to receive(:post).with(URI.parse(@gogo.test_url + "pickups/remove").to_s, form: data)
+
+          @gogo.delete_pickup_address(address_id)
+        end
+      end
+
       describe "#store_address" do
         it "should call the appropriate API endpoint for deleting an order" do
           data = {hello: "world"}

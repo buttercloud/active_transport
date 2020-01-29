@@ -43,6 +43,24 @@ RSpec.describe ActiveTransport::Delivery::TookanProvider do
         allow(HTTP).to receive(:get).and_return(http_resp)
       end
 
+      describe "#list_pickup_addresses" do
+        it "should raise an unsupported method exception" do
+          expect { @tookan.list_pickup_addresses }.to raise_exception(ActiveTransport::Delivery::TookanProvider::UnsupportedOperation)
+        end
+      end
+
+      describe "#create_pickup_address" do
+        it "should raise an unsupported method exception" do
+          expect { @tookan.create_pickup_address({}) }.to raise_exception(ActiveTransport::Delivery::TookanProvider::UnsupportedOperation)
+        end
+      end
+
+      describe "#delete_pickup_address" do
+        it "should raise an unsupported method exception" do
+          expect { @tookan.delete_pickup_address(3) }.to raise_exception(ActiveTransport::Delivery::TookanProvider::UnsupportedOperation)
+        end
+      end
+
       describe "#store_address" do
         it "should call the appropriate API endpoint for deleting an order" do
           data = {hello: "world", api_key: api_key}

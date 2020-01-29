@@ -58,6 +58,18 @@ module ActiveTransport
         connect("address", :post, data)
       end
 
+      def list_pickup_addresses
+        connect("pickups/list", :get, {})
+      end
+
+      def create_pickup_address(data)
+        connect("pickups/add", :post, data)
+      end
+
+      def delete_pickup_address(goog_address_id)
+        connect("pickups/remove", :post, {address_id: goog_address_id})
+      end
+
       private
 
       def connect(path, http_method, data)

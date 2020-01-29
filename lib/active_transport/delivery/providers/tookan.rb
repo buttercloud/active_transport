@@ -58,6 +58,18 @@ module ActiveTransport
         connect("customer/edit", :post, data)
       end
 
+      def list_pickup_addresses
+        raise UnsupportedOperation.new("Operation not supported on Tookan")
+      end
+
+      def create_pickup_address(data)
+        raise UnsupportedOperation.new("Operation not supported on Tookan")
+      end
+
+      def delete_pickup_address(goog_address_id)
+        raise UnsupportedOperation.new("Operation not supported on Tookan")
+      end
+
       private
 
       def connect(path, http_method, data)
