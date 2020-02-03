@@ -1,6 +1,10 @@
 RSpec.describe ActiveTransport::Delivery::GogoProvider do
   let(:api_key) { SecureRandom.hex }
 
+  before(:each) do
+    allow_any_instance_of(ActiveTransport::Delivery::GogoProvider).to receive(:set_access_token!).and_return(true)
+  end
+
   describe "attributes" do
     it "should have the proper URLs set for the API" do
       gogo = ActiveTransport::Delivery::GogoProvider.new({test: true}, {api_key: api_key})
@@ -31,16 +35,43 @@ RSpec.describe ActiveTransport::Delivery::GogoProvider do
 
     describe "API Calls" do
       before(:each) do
+        @username = "username1"
+        @password = "password1"
         http_resp = double("HTTP::Response")
         http_body = double("HTTP::Response::Body")
         @http_client = double("HTTP::Client")
-        @gogo = ActiveTransport::Delivery::GogoProvider.new({test: true}, {api_key: api_key})
+
+        @gogo = ActiveTransport::Delivery::GogoProvider.new({test: true}, {api_key: api_key, username: @username, password: @password})
 
         allow(HTTP).to receive(:headers).and_return(@http_client)
         allow(http_body).to receive(:to_s).and_return({success: "true", data: {hello: "back"}}.to_json)
         allow(http_resp).to receive(:body).and_return(http_body)
         allow(@http_client).to receive(:post).and_return(http_resp)
         allow(@http_client).to receive(:get).and_return(http_resp)
+      end
+
+      describe "#set_access_token!" do
+        it "should call the appropriate API endpoint for getting an access token" do
+          allow_any_instance_of(ActiveTransport::Delivery::GogoProvider).to receive(:set_access_token!).and_call_original
+          expect(HTTP).to receive(:headers).with(username: @username, password: @password)
+          expect(@http_client).to receive(:post).with(URI.parse(@gogo.test_url + "token").to_s)
+
+          @gogo.set_access_token!
+        end
+
+        it "should set the api_key instance attribute to the access token provided" do
+          http_resp = double("HTTP::Response")
+          http_body = double("HTTP::Response::Body")
+
+          allow_any_instance_of(ActiveTransport::Delivery::GogoProvider).to receive(:set_access_token!).and_call_original
+          allow(HTTP).to receive(:headers).and_return(@http_client)
+          allow(http_body).to receive(:to_s).and_return({success: "true", data: {"accessToken" => "blabla"}}.to_json)
+          allow(http_resp).to receive(:body).and_return(http_body)
+          allow(@http_client).to receive(:post).and_return(http_resp)
+
+          @gogo.set_access_token!
+          expect(@gogo.api_key).to eq("blabla")
+        end
       end
 
       describe "#list_pickup_addresses" do

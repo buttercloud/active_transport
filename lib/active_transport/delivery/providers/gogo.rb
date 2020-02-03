@@ -5,7 +5,8 @@ module ActiveTransport
     class GogoProvider < Provider
       class UnsupportedOperation < StandardError; end
 
-      attr_reader :api_key, :test, :test_url, :live_url
+      attr_reader :username, :password, :test, :test_url, :live_url
+      attr_accessor :api_key
 
       def test?
         @test
@@ -13,9 +14,12 @@ module ActiveTransport
 
       def initialize(options = {}, auth = {})
         @api_key = auth[:api_key]
+        @username = auth[:username]
+        @password = auth[:password]
         @test = options[:test] || false
         @test_url = 'http://54.214.99.97/wp-json/gv1/'
         @live_url = 'https://letsgogo.it/wp-json/gv1/'
+        set_access_token!
       end
 
       def create_order(data)
@@ -66,11 +70,32 @@ module ActiveTransport
         connect("pickups/add", :post, data)
       end
 
-      def delete_pickup_address(goog_address_id)
-        connect("pickups/remove", :post, {address_id: goog_address_id})
+      def delete_pickup_address(gogo_address_id)
+        connect("pickups/remove", :post, {address_id: gogo_address_id})
+      end
+
+      def set_access_token!
+        res = access_token(self.username, self.password)
+        self.api_key = res.params["data"]["accessToken"]
       end
 
       private
+
+      def access_token(username, password)
+        api_url = self.test? ? @test_url : @live_url
+        uri = URI.parse(api_url + "token")
+
+        begin
+          res = HTTP.headers(username: username, password: password)
+            .post(uri.to_s)
+
+          body = JSON.parse(res.body.to_s)
+
+          return Response.new(body["success"], body, {test: test?})
+        rescue StandardError, HTTP::Error => e
+          return Response.new(false, {error: e.message}, {test: test?})
+        end
+      end
 
       def connect(path, http_method, data)
         api_url = self.test? ? @test_url : @live_url
